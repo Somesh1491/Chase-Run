@@ -29,17 +29,17 @@ namespace ChaseAndRun
       //Origin is consider to be bottom left of the mesh
       Vector3 originInLocal = mesh.bounds.center + (Vector3.left * mesh.bounds.extents.x) + 
                                                    (Vector3.down * mesh.bounds.extents.y);
-      
-      //Size of each block 
+
+      //Size of each block In Local Space
       float blockWidth = mesh.bounds.size.x / pathFinder.GridDimension.x;
       float blockHeight = mesh.bounds.size.y / pathFinder.GridDimension.y;
 
-      for(int i = 0; i < pathFinder.GridDimension.y; i++)
+      for(int j = 0; j < pathFinder.GridDimension.y; j++)
       {
-        for(int j = 0; j < pathFinder.GridDimension.x; j++)
+        for(int i = 0; i < pathFinder.GridDimension.x; i++)
         {
           //Points in Local
-          Vector3 leftDownPoint = originInLocal + (j * Vector3.right * blockWidth) + (i * Vector3.up * blockHeight);
+          Vector3 leftDownPoint = originInLocal + (i * Vector3.right * blockWidth) + (j * Vector3.up * blockHeight);
           Vector3 rightDownPoint = leftDownPoint + Vector3.right * blockWidth;
           Vector3 leftUpPoint = leftDownPoint + Vector3.up * blockHeight;
           Vector3 rightUpPoint = leftDownPoint + Vector3.right * blockWidth + Vector3.up * blockHeight;
