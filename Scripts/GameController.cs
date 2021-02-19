@@ -9,5 +9,13 @@ namespace ChaseAndRun
     public Transform player;
     public Transform enemy;
     public PathFinder pathFinder;
+    
+    private void Update()
+    {
+      pathFinder.SourcePosition = player.position;
+      pathFinder.TargetPosition = enemy.position;
+
+      var a = pathFinder.ShortestPath;
+    }
   }
 }
