@@ -50,8 +50,22 @@ namespace ChaseAndRun
           blocks[i, j] = new Block
           {
             indexInGrid = new Vector2Int(i, j),
-            isWalkable = false
+            isWalkable = true
           };
+        }
+      }
+
+      int childCount = transform.childCount;
+      for(int i = 0; i < childCount; i++)
+      {
+        Tile tile = transform.GetChild(i).GetComponent<Tile>();
+        if (tile == null)
+          continue;
+
+        if(tile.Type == TileType.Obstacle)
+        {
+          Vector2Int index = WorldToGridPoint(tile.transform.position);
+          blocks[index.x, index.y].isWalkable = false;
         }
       }
     }
@@ -214,7 +228,7 @@ namespace ChaseAndRun
 
     private Block GetBlock(Vector2Int index)
     {
-      if (IsBlockExist(index))
+      if (IsBlockExist(index) && IsBlockWalkable(index))
         return blocks[index.x, index.y];
 
       return null;
@@ -230,6 +244,11 @@ namespace ChaseAndRun
         return false;
 
       return true;
+    }
+
+    private bool IsBlockWalkable(Vector2Int index)
+    {
+      return (blocks[index.x, index.y].isWalkable);
     }
 
     private Vector2Int WorldToGridPoint(Vector3 worldPoint)
