@@ -9,6 +9,7 @@ namespace ChaseAndRun
     public Vector2Int GridDimension { get { return gridDimension; } }
     public Vector3 SourcePosition { get { return sourcePosition; } set { sourcePosition = value; } }
     public Vector3 TargetPosition { get { return targetPosition; } set { targetPosition = value; } }
+    public List<Vector3> ShortestPath { get { return GetShortestPath(); } }
 
     [SerializeField]
     Vector2Int gridDimension;
@@ -19,7 +20,14 @@ namespace ChaseAndRun
     private Mesh mesh;
     private Block[,] blocks;
     private Dictionary<int, Node<Block>> nodesInGraph = new Dictionary<int, Node<Block>>();
-    
+
+    //Deleteing Block
+    GameObject nodeVisitedPrefab;
+    GameObject shortPathPrefab;
+
+    List<GameObject> tempObject = new List<GameObject>();
+    //Deleting Block
+
     private void Awake()
     {
       if((mesh=GetComponent<MeshFilter>().sharedMesh) == null)
@@ -49,11 +57,83 @@ namespace ChaseAndRun
     private void Update()
     {
       DrawGrid();
+
+      /************Testing Code Block*****************/
+      foreach (var obj in tempObject)
+        Destroy(obj);
+
+      /************Testing Code Block*****************/
     }
 
-    private void CreateGraph()
+    private List<Vector3> GetShortestPath()
     {
+      List<Vector3> shortestPath = new List<Vector3>();
+      Node<Block> exploringNode = CreateGraphAndReturnLastNode();
+
+      while(exploringNode != null)
+      {
+        shortestPath.Add(GridToWorldPoint(exploringNode.item.indexInGrid));
+      }
+
+      return shortestPath;
+    }
+
+    private Node<Block> CreateGraphAndReturnLastNode()
+    {
+      //Clear nodes In Graph
+      nodesInGraph.Clear();
+
+      Vector2Int startBlockIndex = WorldToGridPoint(sourcePosition);
+      Vector2Int endBlockIndex = WorldToGridPoint(targetPosition);
+
+      //Source and target must lie within surface
+      if (!IsBlockExist(startBlockIndex) && !IsBlockExist(endBlockIndex))
+        return null;
+
+      Block startBlock = GetBlock(startBlockIndex);
+      Block endBlock = GetBlock(endBlockIndex);
+
+      Node<Block> startNode = new Node<Block>
+      {
+        item = startBlock,
+        parent = null
+      };
+
       Queue queue = new Queue();
+      queue.Enqueue(startNode);
+
+      bool loopTerminationFlag = false;
+      Node<Block> currentNode = null;
+      do
+      {
+        currentNode = (Node<Block>)queue.Dequeue();
+
+        //Get Neighbours of current Block
+        foreach(var neighbour in GetNeighbours(currentNode.item))
+        {
+          //if node already exist in graph 
+          if (nodesInGraph.ContainsKey(GridToLinearPoint(neighbour.indexInGrid)))
+            continue;
+
+          //Create new Node for neighbour Block
+          Node<Block> newNode = new Node<Block>
+          {
+            item = neighbour,
+            parent = currentNode
+          };
+
+          nodesInGraph.Add(GridToLinearPoint(neighbour.indexInGrid), newNode);
+
+          if(neighbour == endBlock)
+          {
+            loopTerminationFlag = true;
+            break;
+          }
+        }
+
+      } while (queue.Count != 0 && !loopTerminationFlag);
+
+      return currentNode;
     }
 
     private List<Block> GetNeighbours(Block block)
@@ -124,10 +204,6 @@ namespace ChaseAndRun
       //Transform Matrix
       Matrix4x4 worldToLocalMatrix = transform.worldToLocalMatrix;
 
-      //Origin is consider to be bottom left of the mesh
-      Vector3 originInLocal = mesh.bounds.center + (Vector3.left * mesh.bounds.extents.x) +
-                                                   (Vector3.down * mesh.bounds.extents.y);
-
       //Size of surface in Local
       float surfaceWidth = mesh.bounds.size.x;
       float surfaceHeight = mesh.bounds.size.y;
@@ -148,6 +224,41 @@ namespace ChaseAndRun
  
       return gridPoint;
     }
+
+    private Vector3 GridToWorldPoint(Vector2Int gridIndex)
+    {
+      //Transform Matrix
+      Matrix4x4 localToWorldMatrix = transform.localToWorldMatrix;
+
+      //Size of each block In Local Space
+      float blockWidth = mesh.bounds.size.x / gridDimension.x;
+      float blockHeight = mesh.bounds.size.y / gridDimension.y;
+
+      //worldPosition considering bottom left of block as pivot
+      Vector3 worldPosition = new Vector3(gridIndex.x * blockWidth, gridIndex.y * blockHeight, 0);
+      //worldPosition considering center of block as pivot
+      worldPosition += new Vector3(gridIndex.x * blockWidth, gridIndex.y * blockHeight, 0) + 
+                       (Vector3.right * blockWidth) + (Vector3.up * blockHeight);
+
+      return worldPosition;
+    }
+    private int GridToLinearPoint(Vector2Int gridIndex)
+    {
+      return ((gridIndex.y * gridDimension.x) + gridIndex.x);
+    }
+
+    private Vector2Int LinearToGridPoint(int linearIndex)
+    {
+      int x = linearIndex % gridDimension.x;
+      int y = linearIndex / gridDimension.y;
+
+      return new Vector2Int(x, y);
+    }
+
+
+    /********************************************************************************************************/                                  
+    /************************Below Codes is are for testing purpose (need to deleted later) 
+    /********************************************************************************************************/
 
     private void DrawGrid()
     {
