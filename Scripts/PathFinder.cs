@@ -17,10 +17,11 @@ namespace ChaseAndRun
     private Vector3 sourcePosition;
     [SerializeField]
     private Vector3 targetPosition;
+    [SerializeField]
+    private bool overlappingEnable = true; 
     private Mesh mesh;
     private Block[,] blocks;
     private Dictionary<int, Node<Block>> nodesInGraph = new Dictionary<int, Node<Block>>();
-
     //Deleteing Block
     [SerializeField]
     GameObject nodeVisitedPrefab;
@@ -75,7 +76,6 @@ namespace ChaseAndRun
       DrawGrid();
 
       Vector2Int gridPos = WorldToGridPoint(sourcePosition);
-      Debug.Log(GridToWorldPoint(gridPos));
     }
 
     private List<Vector3> GetShortestPath()
@@ -83,18 +83,20 @@ namespace ChaseAndRun
       /************Testing Code Block*****************/
       foreach (var obj in tempObject)
         Destroy(obj);
-
       /************Testing Code Block*****************/
 
       List<Vector3> shortestPath = new List<Vector3>();
       Node<Block> exploringNode = CreateGraphAndReturnLastNode();
 
-      while(exploringNode != null)
+      //Do not include the start node
+      if (exploringNode != null)
       {
-        shortestPath.Add(GridToWorldPoint(exploringNode.item.indexInGrid));
-        exploringNode = exploringNode.parent;
+        while (exploringNode.parent != null)
+        {
+          shortestPath.Add(GridToWorldPoint(exploringNode.item.indexInGrid));
+          exploringNode = exploringNode.parent;
+        }
       }
-
       /************Testing Code Block*****************/
       foreach (KeyValuePair<int, Node<Block>>node in nodesInGraph)
       {
@@ -121,6 +123,7 @@ namespace ChaseAndRun
       }
       /************Testing Code Block*****************/
 
+      shortestPath.Reverse();
       return shortestPath;
     }
 
@@ -150,6 +153,7 @@ namespace ChaseAndRun
 
       bool loopTerminationFlag = false;
       Node<Block> currentNode = null;
+      Node<Block> lastNode = null;
       do
       {
         currentNode = (Node<Block>)queue.Dequeue();
@@ -174,13 +178,14 @@ namespace ChaseAndRun
           if(neighbour == endBlock)
           {
             loopTerminationFlag = true;
+            lastNode = newNode;
             break;
           }
         }
 
       } while (queue.Count != 0 && !loopTerminationFlag);
 
-      return currentNode;
+      return lastNode;
     }
 
     private List<Block> GetNeighbours(Block block)
@@ -197,38 +202,68 @@ namespace ChaseAndRun
       Vector2Int leftDownBlockIndex = leftBlockIndex + Vector2Int.down;
       Vector2Int rightDownBlockIndex = rightBlockIndex + Vector2Int.down;
 
-      Block currentBlock;
+      if (IsBlockWalkable(leftBlockIndex))
+          neighbours.Add(GetBlock(leftBlockIndex));
 
-      if ((currentBlock = GetBlock(leftBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+      if (IsBlockWalkable(rightBlockIndex))
+        neighbours.Add(GetBlock(rightBlockIndex));
 
-      if ((currentBlock = GetBlock(rightBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+      if (IsBlockWalkable(downBlockIndex))
+        neighbours.Add(GetBlock(downBlockIndex));
 
-      if ((currentBlock = GetBlock(downBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+      if (IsBlockWalkable(upBlockIndex))
+        neighbours.Add(GetBlock(upBlockIndex));
 
-      if ((currentBlock = GetBlock(upBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+      //Diagonal Neighbour only be considered only if it neighbours are free
+      if (overlappingEnable)
+      {
+        if (IsBlockWalkable(leftUpBlockIndex))
+        {
+          if(IsBlockWalkable(leftBlockIndex) && IsBlockWalkable(upBlockIndex))
+            neighbours.Add(GetBlock(leftUpBlockIndex));
+        }
 
-      if ((currentBlock = GetBlock(leftUpBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+        if (IsBlockWalkable(rightUpBlockIndex))
+        {
+          if (IsBlockWalkable(rightBlockIndex) && IsBlockWalkable(upBlockIndex))
+            neighbours.Add(GetBlock(rightUpBlockIndex));
+        }
 
-      if ((currentBlock = GetBlock(rightUpBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+        if (IsBlockWalkable(leftDownBlockIndex))
+        {
+          if (IsBlockWalkable(leftBlockIndex) && IsBlockWalkable(downBlockIndex))
+            neighbours.Add(GetBlock(leftDownBlockIndex));
+        }
 
-      if ((currentBlock = GetBlock(leftDownBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+        if (IsBlockWalkable(rightDownBlockIndex))
+        {
+          if (IsBlockWalkable(rightBlockIndex) && IsBlockWalkable(downBlockIndex))
+            neighbours.Add(GetBlock(rightDownBlockIndex));
+        }
+      }
 
-      if ((currentBlock = GetBlock(rightDownBlockIndex)) != null)
-        neighbours.Add(currentBlock);
+      else
+      {
+        if (IsBlockWalkable(leftUpBlockIndex))
+          neighbours.Add(GetBlock(leftUpBlockIndex));
+
+        if (IsBlockWalkable(rightUpBlockIndex))
+          neighbours.Add(GetBlock(rightUpBlockIndex));
+
+        if (IsBlockWalkable(leftDownBlockIndex))
+          neighbours.Add(GetBlock(leftDownBlockIndex));
+
+        if (IsBlockWalkable(rightDownBlockIndex))
+          neighbours.Add(GetBlock(rightDownBlockIndex));
+      }
+      
 
       return neighbours;
     }
 
     private Block GetBlock(Vector2Int index)
     {
-      if (IsBlockExist(index) && IsBlockWalkable(index))
+      if (IsBlockExist(index))
         return blocks[index.x, index.y];
 
       return null;
@@ -248,6 +283,9 @@ namespace ChaseAndRun
 
     private bool IsBlockWalkable(Vector2Int index)
     {
+      if (!IsBlockExist(index))
+        return false;
+
       return (blocks[index.x, index.y].isWalkable);
     }
 
