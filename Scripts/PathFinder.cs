@@ -50,8 +50,8 @@ namespace ChaseAndRun
         {
           blocks[i, j] = new Block
           {
-            indexInGrid = new Vector2Int(i, j),
-            isWalkable = true
+            IndexInGrid = new Vector2Int(i, j),
+            IsWalkable = true
           };
         }
       }
@@ -66,7 +66,7 @@ namespace ChaseAndRun
         if(tile.Type == TileType.Obstacle)
         {
           Vector2Int index = WorldToGridPoint(tile.transform.position);
-          blocks[index.x, index.y].isWalkable = false;
+          blocks[index.x, index.y].IsWalkable = false;
         }
       }
     }
@@ -93,7 +93,7 @@ namespace ChaseAndRun
       {
         while (exploringNode.parent != null)
         {
-          shortestPath.Add(GridToWorldPoint(exploringNode.item.indexInGrid));
+          shortestPath.Add(GridToWorldPoint(exploringNode.item.IndexInGrid));
           exploringNode = exploringNode.parent;
         }
       }
@@ -105,7 +105,7 @@ namespace ChaseAndRun
         float blockHeight = (mesh.bounds.size.y * transform.localScale.y) / gridDimension.y;
 
         GameObject g = Instantiate(nodeVisitedPrefab);
-        g.transform.position = GridToWorldPoint(node.Value.item.indexInGrid);
+        g.transform.position = GridToWorldPoint(node.Value.item.IndexInGrid);
         g.transform.localScale = new Vector3(blockWidth, blockHeight);
         tempObject.Add(g);
       }
@@ -125,6 +125,11 @@ namespace ChaseAndRun
 
       shortestPath.Reverse();
       return shortestPath;
+    }
+
+    public void InitDefault()
+    {
+      gridDimension = new Vector2Int(10, 10);
     }
 
     private Node<Block> CreateGraphAndReturnLastNode()
@@ -162,7 +167,7 @@ namespace ChaseAndRun
         foreach(var neighbour in GetNeighbours(currentNode.item))
         {
           //if node already exist in graph 
-          if (nodesInGraph.ContainsKey(GridToLinearPoint(neighbour.indexInGrid)))
+          if (nodesInGraph.ContainsKey(GridToLinearPoint(neighbour.IndexInGrid)))
             continue;
 
           //Create new Node for neighbour Block
@@ -172,7 +177,7 @@ namespace ChaseAndRun
             parent = currentNode
           };
 
-          nodesInGraph.Add(GridToLinearPoint(neighbour.indexInGrid), newNode);
+          nodesInGraph.Add(GridToLinearPoint(neighbour.IndexInGrid), newNode);
           queue.Enqueue(newNode);
 
           if(neighbour == endBlock)
@@ -192,10 +197,10 @@ namespace ChaseAndRun
     {
       List<Block> neighbours = new List<Block>();
       
-      Vector2Int leftBlockIndex = block.indexInGrid + Vector2Int.left;
-      Vector2Int rightBlockIndex = block.indexInGrid + Vector2Int.right;
-      Vector2Int downBlockIndex = block.indexInGrid + Vector2Int.down;
-      Vector2Int upBlockIndex = block.indexInGrid + Vector2Int.up;
+      Vector2Int leftBlockIndex = block.IndexInGrid + Vector2Int.left;
+      Vector2Int rightBlockIndex = block.IndexInGrid + Vector2Int.right;
+      Vector2Int downBlockIndex = block.IndexInGrid + Vector2Int.down;
+      Vector2Int upBlockIndex = block.IndexInGrid + Vector2Int.up;
 
       Vector2Int leftUpBlockIndex = leftBlockIndex + Vector2Int.up;
       Vector2Int rightUpBlockIndex = rightBlockIndex + Vector2Int.up;
@@ -286,7 +291,7 @@ namespace ChaseAndRun
       if (!IsBlockExist(index))
         return false;
 
-      return (blocks[index.x, index.y].isWalkable);
+      return (blocks[index.x, index.y].IsWalkable);
     }
 
     private Vector2Int WorldToGridPoint(Vector3 worldPoint)

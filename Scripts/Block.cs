@@ -4,9 +4,12 @@ using UnityEngine;
 
 namespace ChaseAndRun
 {
-  public class Block
+  public class Block : MonoBehaviour, IBlock
   {
-    public Vector2Int indexInGrid;
-    public bool isWalkable;
+    public Vector2Int IndexInGrid { get { return indexInGrid; } set { indexInGrid = value; } }
+    public bool IsWalkable { get { return isWalkable; } set { isWalkable = value; } }
+
+    private Vector2Int indexInGrid;
+    private bool isWalkable;
   }
 }
