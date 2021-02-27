@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace ChaseAndRun
@@ -44,48 +45,58 @@ namespace ChaseAndRun
     {
       if (enableEditing)
       {
-        Vector2 mousePosition = Event.current.mousePosition;
-        Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+        Event e = Event.current;
 
-        RaycastHit hitInfo;
-
-
-        if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity))
+        if(e.type == EventType.MouseMove)
         {
-          // if Gameobject has Surface Component
-          if (hitInfo.collider.gameObject.GetComponent<Surface>() != null)
-          {
-            if (highlightTileObject == null)
-              highlightTileObject = Instantiate(highlightTilePrefab);
-
-            Vector2Int gridPoint = WorldToGridPoint(hitInfo.point);
-            Vector3 worldPoint = GridToWorldPoint(gridPoint);
-
-            //Size of each block In World Space
-            float blockWidth = (mesh.bounds.size.x / surface.GridDimension.x) * surface.transform.localScale.x;
-            float blockHeight = mesh.bounds.size.y / surface.GridDimension.y * surface.transform.localScale.y;
-
-            highlightTileObject.transform.localScale = new Vector3(blockWidth, blockHeight, 0.1f);
-            highlightTileObject.transform.position = worldPoint;
-          }
+          HighLightBlock();
         }
 
-        else
+        else if(e.type == EventType.MouseDown)
         {
-          if (highlightTileObject != null)
-          {
-            DestroyImmediate(highlightTileObject);
-            highlightTileObject = null;
-          }
+          Debug.Log(Selection.activeObject);
         }
       }
-
-      
 
       DrawGrid();
     }
 
-    
+    private void HighLightBlock()
+    {
+      Vector2 mousePosition = Event.current.mousePosition;
+      Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+
+      RaycastHit hitInfo;
+
+      if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity))
+      {
+        // if Gameobject has Surface Component
+        if (hitInfo.collider.gameObject.GetComponent<Surface>() != null)
+        {
+          if (highlightTileObject == null)
+            highlightTileObject = Instantiate(highlightTilePrefab);
+
+          Vector2Int gridPoint = WorldToGridPoint(hitInfo.point);
+          Vector3 worldPoint = GridToWorldPoint(gridPoint);
+
+          //Size of each block In World Space
+          float blockWidth = (mesh.bounds.size.x / surface.GridDimension.x) * surface.transform.localScale.x;
+          float blockHeight = mesh.bounds.size.y / surface.GridDimension.y * surface.transform.localScale.y;
+
+          highlightTileObject.transform.localScale = new Vector3(blockWidth, blockHeight, 0.1f);
+          highlightTileObject.transform.position = worldPoint;
+        }
+      }
+
+      else
+      {
+        if (highlightTileObject != null)
+        {
+          DestroyImmediate(highlightTileObject);
+          highlightTileObject = null;
+        }
+      }
+    }
     private Vector2Int WorldToGridPoint(Vector3 worldPoint)
     {
       //Transform Matrix
