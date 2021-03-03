@@ -7,21 +7,25 @@ namespace ChaseAndRun
 {
   public class SceneViewWindow
   {
-    private LevelEditor window;
-    private float splitFraction;
-    public SceneViewWindow(LevelEditor window)
+    private ILevelData levelData;
+    private ILevelWindow levelWindow;
+
+    public SceneViewWindow(ILevelData levelData, ILevelWindow levelWindow)
     {
-      this.window = window;
+      this.levelData = levelData;
+      this.levelWindow = levelWindow;
     }
 
-    public void DrawSceneView(float splitFraction)
+    public void DrawSceneView()
     {
-      this.splitFraction = splitFraction;
+      float window_width = levelWindow.Width;
+      float window_height = levelWindow.Height;
+      float splitFraction = levelWindow.SplitFraction;
 
-      Vector2Int gridDimension = window.GridDimension;
+      Vector2Int gridDimension = levelData.GridDimension;
 
-      float sceneViewWidth = splitFraction * window.position.width;
-      float sceneViewHeight = window.position.height;
+      float sceneViewWidth = splitFraction * window_width;
+      float sceneViewHeight = window_height;
 
       float blockWidth = sceneViewWidth / gridDimension.x;
       float blockHeight = sceneViewHeight / gridDimension.y;
@@ -36,16 +40,16 @@ namespace ChaseAndRun
 
       //Execute code if mouse is in scene view or gui view
       Vector3 mousePosition = Event.current.mousePosition;
-      if (mousePosition.x >= 0 && mousePosition.x < (splitFraction * window.position.width)
-          && mousePosition.y >= 0 && mousePosition.y <= (window.position.height))
+      if (mousePosition.x >= 0 && mousePosition.x < (splitFraction * window_width)
+          && mousePosition.y >= 0 && mousePosition.y <= (window_height))
         OnPointerOver();
     }
 
     private void OnPointerOver()
     {
-      Vector2Int gridDimension = window.GridDimension;
-      float sceneViewWidth = splitFraction * window.position.width;
-      float sceneViewHeight = window.position.height;
+      Vector2Int gridDimension = levelData.GridDimension;
+      float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
+      float sceneViewHeight = levelWindow.Height;
 
       float blockWidth = sceneViewWidth / gridDimension.x;
       float blockHeight = sceneViewHeight / gridDimension.y;

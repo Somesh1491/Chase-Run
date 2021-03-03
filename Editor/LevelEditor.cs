@@ -8,47 +8,48 @@ namespace ChaseAndRun
 {
   public class LevelEditor : EditorWindow
   {
-    public Vector2Int GridDimension { get { return gridDimension; } set { gridDimension = value; } }
-
     //Left part of the window
     private Rect sceneView;
     //Right part of the window
     private Rect guiView;
 
-    private Vector2 windowSize;
     //Rect that divide the window in two parts
     private Rect splitter;
-    //tell about the scene view and gui view space ratio in window
-    private float splitFraction;
     private bool resizeViews = false;
-
-    private Vector2Int gridDimension;
 
     private static SceneViewWindow sceneViewWindow;
     private static GUIViewWindow guiViewWindow;
+    private static ILevelData levelData;
+    private static ILevelWindow levelWindow;
 
     [MenuItem("Chase-Run/Open Level Editor")]
     private static void CreateWindow()
     {
-      var window = GetWindow<LevelEditor>("Level Editor");
-      sceneViewWindow = new SceneViewWindow(window);
-      guiViewWindow = new GUIViewWindow(window);
+      GetWindow<LevelEditor>("Level Editor");   
     }
 
     private void OnEnable()
     {
-      windowSize = position.size;
-      //Equal area is given to scene view and gui view in window
-      splitFraction = 0.5f;
+      levelData = new LevelData();
+      levelWindow = new LevelWindow();
 
-      splitter = new Rect((splitFraction * windowSize.x) - 1, 0, 2f, windowSize.y);
+      sceneViewWindow = new SceneViewWindow(levelData, levelWindow);
+      guiViewWindow = new GUIViewWindow(levelData, levelWindow);
+
+      //Equal area is given to scene view and gui view in window
+      levelWindow.SplitFraction = 0.5f;
+      levelWindow.Width = position.width;
+      levelWindow.Height = position.height;
+
+      splitter = new Rect((levelWindow.SplitFraction * levelWindow.Width) - 1, 0, 2f, levelWindow.Height);
     }
 
     void OnGUI()
     {
       if (IsWindowResized())
       {
-        windowSize = position.size;
+        levelWindow.Width = position.width;
+        levelWindow.Height = position.height;
       }
 
       if (Event.current.type == EventType.MouseDown && splitter.Contains(Event.current.mousePosition))
@@ -58,24 +59,24 @@ namespace ChaseAndRun
 
       if (resizeViews)
       {
-        splitFraction = Event.current.mousePosition.x / windowSize.x;
+        levelWindow.SplitFraction = Event.current.mousePosition.x / levelWindow.Width;
       }
 
       if (Event.current.type == EventType.MouseUp)
         resizeViews = false;
 
-      splitFraction = Mathf.Clamp(splitFraction, 0.3f, 0.7f);
+      levelWindow.SplitFraction = Mathf.Clamp(levelWindow.SplitFraction, 0.3f, 0.7f);
       SetSplitter();
 
-      sceneViewWindow.DrawSceneView(splitFraction);
-      guiViewWindow.DrawGUIView(splitFraction);
+      sceneViewWindow.DrawSceneView();
+      guiViewWindow.DrawGUIView();
 
       Repaint();
     }
 
     private bool IsWindowResized()
     {
-      if (position.width != windowSize.x || position.height != windowSize.y)
+      if (position.width != levelWindow.Width || position.height != levelWindow.Height)
         return true;
 
       return false;
@@ -86,7 +87,7 @@ namespace ChaseAndRun
 
     private void SetSplitter()
     {
-      splitter.Set((splitFraction * windowSize.x) - 1, 0, 2f, windowSize.y);
+      splitter.Set((levelWindow.SplitFraction * levelWindow.Width) - 1, 0, 2f, levelWindow.Height);
       GUI.DrawTexture(splitter, EditorGUIUtility.whiteTexture);
       EditorGUIUtility.AddCursorRect(splitter, MouseCursor.ResizeHorizontal);
     }
