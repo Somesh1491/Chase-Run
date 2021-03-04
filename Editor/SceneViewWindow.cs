@@ -34,7 +34,32 @@ namespace ChaseAndRun
       {
         for (int i = 0; i < gridDimension.x; i++)
         {
+          Handles.color = Color.gray;
           DrawRect(i * blockWidth, j * blockHeight, blockWidth, blockHeight);
+        }
+      }
+
+
+      //Draw Tiles 
+      if (levelData.Tiles != null)
+      {
+        for (int j = 0; j < levelData.Tiles.GetLength(1); j++)
+        {
+          for (int i = 0; i < levelData.Tiles.GetLength(0); i++)
+          {
+            Vector3 tileScreenPosition = GridToScreenPoint(new Vector2Int(i, j));
+            switch (levelData.Tiles[i, j])
+            {
+              case TileType.Walkable:
+                Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
+                break;
+              case TileType.Obstacle:
+                Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.gray, Color.black);
+                break;
+              default:
+                break;
+            }
+          }
         }
       }
 
@@ -47,6 +72,35 @@ namespace ChaseAndRun
 
     private void OnPointerOver()
     {
+      if(levelData.IsEditingEnable)
+      {
+        Vector2Int gridDimension = levelData.GridDimension;
+        float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
+        float sceneViewHeight = levelWindow.Height;
+
+        float blockWidth = sceneViewWidth / gridDimension.x;
+        float blockHeight = sceneViewHeight / gridDimension.y;
+
+        Vector2Int gridPosition = ScreenToGridPoint(Event.current.mousePosition);
+        Vector3 screenPosition = GridToScreenPoint(gridPosition);
+
+        if(levelData.SelectedTile == TileType.Walkable)
+          Handles.DrawSolidRectangleWithOutline(new Rect(screenPosition.x, screenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
+
+        else if(levelData.SelectedTile == TileType.Obstacle)
+          Handles.DrawSolidRectangleWithOutline(new Rect(screenPosition.x, screenPosition.y, blockWidth, blockHeight), Color.gray, Color.black);
+
+        //If Mouse Click over grid
+        if(Event.current.type == EventType.MouseUp)
+        {
+          Vector2Int gridPoint = ScreenToGridPoint(Event.current.mousePosition);
+          levelData.Tiles[gridPoint.x, gridPoint.y] = levelData.SelectedTile;
+        }
+      }
+    }
+
+    private Vector2Int ScreenToGridPoint(Vector3 screenPoint)
+    {
       Vector2Int gridDimension = levelData.GridDimension;
       float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
       float sceneViewHeight = levelWindow.Height;
@@ -54,13 +108,29 @@ namespace ChaseAndRun
       float blockWidth = sceneViewWidth / gridDimension.x;
       float blockHeight = sceneViewHeight / gridDimension.y;
 
-      int x = (int)(Event.current.mousePosition.x / blockWidth);
-      int y = (int)(Event.current.mousePosition.y / blockHeight);
+      int x = (int)(screenPoint.x / blockWidth);
+      //make the origin from top left to bottom left
+      int y = (gridDimension.y - 1) - (int)(screenPoint.y / blockHeight);
+
+      return new Vector2Int(x, y);
     }
 
+    private Vector3 GridToScreenPoint(Vector2Int gridPoint)
+    {
+      gridPoint.y = (levelData.GridDimension.y - 1) - gridPoint.y;
+      Vector2Int gridDimension = levelData.GridDimension;
+      float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
+      float sceneViewHeight = levelWindow.Height;
+
+      float blockWidth = sceneViewWidth / gridDimension.x;
+      float blockHeight = sceneViewHeight / gridDimension.y;
+
+      Vector3 screenPoint = new Vector3(gridPoint.x * blockWidth, gridPoint.y * blockHeight);
+
+      return screenPoint;
+    }
     private void DrawRect(float x, float y, float width, float height)
     {
-      Handles.color = Color.gray;
       Vector3 point1 = new Vector3(x, y, 0);
       Vector3 point2 = new Vector3(x, y, 0) + Vector3.right * width;
       Vector3 point3 = new Vector3(x, y, 0) + Vector3.up * height;

@@ -82,9 +82,6 @@ namespace ChaseAndRun
       return false;
     }
 
-    
-    
-
     private void SetSplitter()
     {
       splitter.Set((levelWindow.SplitFraction * levelWindow.Width) - 1, 0, 2f, levelWindow.Height);

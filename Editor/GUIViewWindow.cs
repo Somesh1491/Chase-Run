@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -13,7 +14,6 @@ namespace ChaseAndRun
     private string gridDimensionTextField_X = "0";
     private string gridDimensionTextField_Y = "0";
     private string[] tileTypes = new string[] { "Walkable", "Obstacle" };
-    private int currentTile;
     public GUIViewWindow(ILevelData levelData, ILevelWindow levelWindow)
     {
       this.levelData = levelData;
@@ -55,14 +55,16 @@ namespace ChaseAndRun
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
 
       Rect gridDimensionPopUpRect = new Rect(x_Offset, 40, 100, 20);
-      currentTile = EditorGUI.Popup(gridDimensionPopUpRect, currentTile, tileTypes);
+      int currentTile = EditorGUI.Popup(gridDimensionPopUpRect, (int)levelData.SelectedTile, tileTypes);
+      levelData.SelectedTile = (TileType)currentTile;
 
       //Draw Edit and Save Level
       x_Offset = (splitFraction * window_width) + 5f;
       Rect editButtonRect = new Rect(x_Offset, 60, 100, 20);
       if(GUI.Button(editButtonRect, "Edit Level"))
       {
-
+        levelData.IsEditingEnable = true;
+        levelData.Tiles = new TileType[gridDimension.x, gridDimension.y];
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
@@ -72,7 +74,10 @@ namespace ChaseAndRun
 
       }
 
-      levelData.GridDimension = gridDimension;
+      if (levelData.GridDimension.x != gridDimension.x || levelData.GridDimension.y != gridDimension.y)
+      {
+        levelData.GridDimension = gridDimension;
+      }
 
       //Execute code if mouse is in scene view or gui view
       Vector3 mousePosition = Event.current.mousePosition;
