@@ -6,20 +6,20 @@ namespace ChaseAndRun
 {
   public class Level : MonoBehaviour
   {
-    private ILevelData levelData;    
+    private IGrid<TileType> gridData;    
     private Tile[,] tiles;
 
-    public void SetData(ILevelData levelData)
+    public void SetData(IGrid<TileType> gridData)
     {
-      this.levelData = levelData;
-      tiles = new Tile[levelData.GridDimension.x, levelData.GridDimension.y];
+      this.gridData = gridData;
+      tiles = new Tile[gridData.GridDimension.x, gridData.GridDimension.y];
 
       for (int j = 0; j < tiles.GetLength(1); j++)
       {
         for (int i = 0; i < tiles.GetLength(0); i++)
         {
           GameObject gameObject = null;
-          if (levelData.GetTile(new Vector2Int(i, j)) == TileType.Walkable)
+          if (gridData.GetCell(new Vector2Int(i, j)).item == TileType.Walkable)
             gameObject = CreateTileObject(TileType.Walkable);
 
           else

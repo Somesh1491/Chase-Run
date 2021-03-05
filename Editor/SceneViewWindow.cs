@@ -40,16 +40,16 @@ namespace ChaseAndRun
       }
 
       //Draw Tiles 
-      if (levelData.Tiles != null)
+      if (levelData.Cells != null)
       {
-        for (int i = 0; i < levelData.Tiles.Length; i++)
+        for (int i = 0; i < levelData.Cells.Length; i++)
         {
 
           int y = i / gridDimension.x;
           int x = i % gridDimension.x;
 
           Vector3 tileScreenPosition = GridToScreenPoint(new Vector2Int(x, y));
-          switch (levelData.GetTile(new Vector2Int(x, y)))
+          switch (levelData.GetCell(new Vector2Int(x, y)).item)
           {
             case TileType.Walkable:
               Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
@@ -94,7 +94,7 @@ namespace ChaseAndRun
         if(Event.current.type == EventType.MouseUp)
         {
           Vector2Int gridPoint = ScreenToGridPoint(Event.current.mousePosition);
-          levelData.SetTile(new Vector2Int(gridPoint.x, gridPoint.y), levelData.SelectedTile);
+          levelData.SetCell(new Vector2Int(gridPoint.x, gridPoint.y), levelData.SelectedTile);
         }
       }
     }

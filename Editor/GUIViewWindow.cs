@@ -64,7 +64,7 @@ namespace ChaseAndRun
       if(GUI.Button(editButtonRect, "Edit Level"))
       {
         levelData.IsEditingEnable = true;
-        levelData.CreateTiles(levelData.GridDimension);
+        levelData.Cells = new Cell<TileType>[gridDimension.x * gridDimension.y];
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;

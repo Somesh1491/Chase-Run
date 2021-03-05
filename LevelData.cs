@@ -6,36 +6,30 @@ namespace ChaseAndRun
 {
   public class LevelData : ScriptableObject, ILevelData
   {
+    public bool IsEditingEnable { get; set; }
     public Vector2Int GridDimension { get { return gridDimension; } set { gridDimension = value; } }
-
-    public bool IsEditingEnable { get { return isEditingEnable; } set { isEditingEnable = value; } }
-
-    public TileType[] Tiles { get { return tiles; } set { tiles = value; } }
-
-    public TileType SelectedTile { get { return selectedTile; } set { selectedTile = value; } }
+    public Cell<TileType>[] Cells { get { return cells; } set { cells = value; } }
+    public TileType SelectedTile { get; set; }
 
     [SerializeField]
     private Vector2Int gridDimension;
     [SerializeField]
-    private bool isEditingEnable;
-    [SerializeField]
-    private TileType[] tiles;
-    [SerializeField]
-    private TileType selectedTile;
+    private Cell<TileType>[] cells;
+
 
     public void CreateTiles(Vector2Int dimension)
     {
-      tiles = new TileType[dimension.x * dimension.y];
+      Cells = new Cell<TileType>[dimension.x * dimension.y];
     }
 
-    public TileType GetTile(Vector2Int index)
+    public Cell<TileType> GetCell(Vector2Int index)
     {
-      return tiles[gridDimension.x * index.y + index.x];
+      return Cells[gridDimension.x * index.y + index.x];
     }
 
-    public void SetTile(Vector2Int index, TileType value)
+    public void SetCell(Vector2Int index, TileType value)
     {
-      tiles[gridDimension.x * index.y + index.x] = value;
+      Cells[gridDimension.x * index.y + index.x].item = value;
     }
   }
 }
