@@ -39,26 +39,26 @@ namespace ChaseAndRun
         }
       }
 
-
       //Draw Tiles 
       if (levelData.Tiles != null)
       {
-        for (int j = 0; j < levelData.Tiles.GetLength(1); j++)
+        for (int i = 0; i < levelData.Tiles.Length; i++)
         {
-          for (int i = 0; i < levelData.Tiles.GetLength(0); i++)
+
+          int y = i / gridDimension.x;
+          int x = i % gridDimension.x;
+
+          Vector3 tileScreenPosition = GridToScreenPoint(new Vector2Int(x, y));
+          switch (levelData.GetTile(new Vector2Int(x, y)))
           {
-            Vector3 tileScreenPosition = GridToScreenPoint(new Vector2Int(i, j));
-            switch (levelData.Tiles[i, j])
-            {
-              case TileType.Walkable:
-                Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
-                break;
-              case TileType.Obstacle:
-                Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.gray, Color.black);
-                break;
-              default:
-                break;
-            }
+            case TileType.Walkable:
+              Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
+              break;
+            case TileType.Obstacle:
+              Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.gray, Color.black);
+              break;
+            default:
+              break;
           }
         }
       }
@@ -94,7 +94,7 @@ namespace ChaseAndRun
         if(Event.current.type == EventType.MouseUp)
         {
           Vector2Int gridPoint = ScreenToGridPoint(Event.current.mousePosition);
-          levelData.Tiles[gridPoint.x, gridPoint.y] = levelData.SelectedTile;
+          levelData.SetTile(new Vector2Int(gridPoint.x, gridPoint.y), levelData.SelectedTile);
         }
       }
     }

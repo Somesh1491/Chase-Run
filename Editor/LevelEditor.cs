@@ -30,7 +30,7 @@ namespace ChaseAndRun
 
     private void OnEnable()
     {
-      levelData = new LevelData();
+      levelData = ScriptableObjectUtility.CreateAsset<LevelData>();
       levelWindow = new LevelWindow();
 
       sceneViewWindow = new SceneViewWindow(levelData, levelWindow);

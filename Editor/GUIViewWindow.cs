@@ -64,14 +64,14 @@ namespace ChaseAndRun
       if(GUI.Button(editButtonRect, "Edit Level"))
       {
         levelData.IsEditingEnable = true;
-        levelData.Tiles = new TileType[gridDimension.x, gridDimension.y];
+        levelData.CreateTiles(levelData.GridDimension);
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
       Rect saveButtonRect = new Rect(x_Offset, 60, 100, 20);
       if (GUI.Button(saveButtonRect, "Save Level"))
       {
-
+        ScriptableObjectUtility.SaveAsset<LevelData>((LevelData)levelData, "Assets/Resources/LevelData");
       }
 
       if (levelData.GridDimension.x != gridDimension.x || levelData.GridDimension.y != gridDimension.y)
