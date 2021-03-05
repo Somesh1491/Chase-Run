@@ -65,6 +65,12 @@ namespace ChaseAndRun
       {
         levelData.IsEditingEnable = true;
         levelData.Cells = new Cell<TileType>[gridDimension.x * gridDimension.y];
+
+        //Make all cell walkable
+        for(int i = 0; i < levelData.Cells.Length; i++)
+        {
+          levelData.Cells[i].weight = 1;
+        }
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;

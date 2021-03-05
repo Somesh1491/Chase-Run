@@ -24,12 +24,41 @@ namespace ChaseAndRun
 
     public Cell<TileType> GetCell(Vector2Int index)
     {
-      return Cells[gridDimension.x * index.y + index.x];
+      if(IsCellExist(index))
+        return Cells[gridDimension.x * index.y + index.x];
+
+      return default;
     }
 
     public void SetCell(Vector2Int index, TileType value)
     {
       Cells[gridDimension.x * index.y + index.x].item = value;
+
+      switch(value)
+      {
+        case TileType.Walkable:
+          Cells[gridDimension.x * index.y + index.x].weight = 1;
+          break;
+
+        case TileType.Obstacle:
+          Cells[gridDimension.x * index.y + index.x].weight = -1;
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    public bool IsCellExist(Vector2Int index)
+    {
+      //Horizontal Check
+      if (index.x < 0 || index.x >= GridDimension.x)
+        return false;
+      //Vertical Check
+      if (index.y < 0 || index.y >= GridDimension.y)
+        return false;
+
+      return true;
     }
   }
 }
