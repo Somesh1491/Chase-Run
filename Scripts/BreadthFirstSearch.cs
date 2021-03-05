@@ -10,19 +10,34 @@ namespace ChaseAndRun
     public Node<T> parent;
   }
 
-  public class ShortestPath<T>
+  public class BreadthFirstSearch<T> : ShortestPathAlgorithm<T>
   {
-    public Vector2Int SourceIndex { get; set; }
-    public Vector2Int TargetIndex { get; set; }
-
-    private IGrid<T> grid;
-
-    private Dictionary<int, Node<Cell<T>>> nodesInGraph = new Dictionary<int, Node<Cell<T>>>();
     private bool overlappingEnable = true;
 
-    public ShortestPath(IGrid<T> grid)
+    public override List<Vector2Int> ShortestPath { get { return GetShortestPath(); } }
+
+    public BreadthFirstSearch(IGrid<T> grid)
     {
       this.grid = grid;
+    }
+
+    protected override List<Vector2Int> GetShortestPath()
+    {
+      Node<Cell<T>> exploringNode = CreateGraphAndReturnLastNode();
+      List<Vector2Int> shortestPath = new List<Vector2Int>();
+
+      //Do not include the start node
+      if (exploringNode != null)
+      {
+        while (exploringNode.parent != null)
+        {
+          shortestPath.Add(exploringNode.item.index);
+          exploringNode = exploringNode.parent;
+        }
+      }
+
+      shortestPath.Reverse();
+      return shortestPath;
     }
 
     private Node<Cell<T>> CreateGraphAndReturnLastNode()
