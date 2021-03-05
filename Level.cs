@@ -6,56 +6,50 @@ namespace ChaseAndRun
 {
   public class Level : MonoBehaviour
   {
-    private LevelData levelData;    
+    private ILevelData levelData;    
     private Tile[,] tiles;
 
-    [SerializeField]
-    private Tile walkablePrefab;
-    [SerializeField]
-    private Tile obstaclePrefab;
-    private void Awake()
+    public void SetData(ILevelData levelData)
     {
-      levelData = Resources.Load("LevelData/Level_1") as LevelData;
+      this.levelData = levelData;
       tiles = new Tile[levelData.GridDimension.x, levelData.GridDimension.y];
-    }
 
-    private void Start()
-    {
-      for(int j = 0; j < tiles.GetLength(1); j++)
+      for (int j = 0; j < tiles.GetLength(1); j++)
       {
-        for(int i = 0; i < tiles.GetLength(0); i++)
+        for (int i = 0; i < tiles.GetLength(0); i++)
         {
-          Tile tile = null;
+          GameObject gameObject = null;
           if (levelData.GetTile(new Vector2Int(i, j)) == TileType.Walkable)
-            tile = CreateTile(TileType.Walkable);
+            gameObject = CreateTileObject(TileType.Walkable);
 
           else
-            tile = CreateTile(TileType.Obstacle);
+            gameObject = CreateTileObject(TileType.Obstacle);
 
-          tile.transform.SetParent(transform);
-          tile.transform.localPosition = new Vector3(i, j, 0);
+          gameObject.transform.SetParent(transform);
+          gameObject.transform.localPosition = new Vector3(i, j, 0);
         }
       }
     }
 
-    private Tile CreateTile(TileType tileType)
+    private GameObject CreateTileObject(TileType tileType)
     {
-      Tile tile = null;
+      GameObject tileObject = null;
+
       switch (tileType)
       {
         case TileType.Walkable:
-          tile = Instantiate<Tile>(walkablePrefab);
+          tileObject = Instantiate(AssetUtility.Instance.walkableTilePrefab);
           break;
 
         case TileType.Obstacle:
-          tile = Instantiate<Tile>(obstaclePrefab);
+          tileObject = Instantiate(AssetUtility.Instance.obstacleTilePrefab);
           break;
 
         default:
           break;
       }
 
-      return tile;
+      return tileObject;
     }
   }
 }

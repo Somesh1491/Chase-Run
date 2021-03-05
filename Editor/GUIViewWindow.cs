@@ -72,6 +72,13 @@ namespace ChaseAndRun
       if (GUI.Button(saveButtonRect, "Save Level"))
       {
         ScriptableObjectUtility.SaveAsset<LevelData>((LevelData)levelData, "Assets/Resources/LevelData");
+        
+        //Create a Game object and assign a level data to it
+        GameObject levelObject = new GameObject();
+        levelObject.name = "Level";
+        levelObject.AddComponent<Level>();
+
+        levelObject.GetComponent<Level>().SetData(levelData);
       }
 
       if (levelData.GridDimension.x != gridDimension.x || levelData.GridDimension.y != gridDimension.y)

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f85ab289d6d8737449e3b464e5a3976d, type: 3}
+  m_Name: AssetData
+  m_EditorClassIdentifier: 
+  walkableTilePrefab: {fileID: 2222507595122416054, guid: 92b9cad98a5e413439d1879a0b5d2472,
+    type: 3}
+  obstacleTilePrefab: {fileID: 8040336913603351562, guid: 6c9b3bfa2b34832438b07d76382737a7,
+    type: 3}
