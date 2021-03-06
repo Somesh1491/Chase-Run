@@ -8,19 +8,11 @@ namespace ChaseAndRun
   {
     public bool IsEditingEnable { get; set; }
     public Vector2Int GridDimension { get { return gridDimension; } set { gridDimension = value; } }
-    public Cell<TileType>[] Cells { get { return cells; } set { cells = value; } }
+    public Cell<TileType>[] Cells { get; set; }
     public TileType SelectedTile { get; set; }
 
     [SerializeField]
     private Vector2Int gridDimension;
-    [SerializeField]
-    private Cell<TileType>[] cells;
-
-
-    public void CreateTiles(Vector2Int dimension)
-    {
-      Cells = new Cell<TileType>[dimension.x * dimension.y];
-    }
 
     public Cell<TileType> GetCell(Vector2Int index)
     {
@@ -34,7 +26,9 @@ namespace ChaseAndRun
     {
       Cells[gridDimension.x * index.y + index.x].item = value;
 
-      switch(value)
+      Cells[gridDimension.x * index.y + index.x].index = index;
+
+      switch (value)
       {
         case TileType.Walkable:
           Cells[gridDimension.x * index.y + index.x].weight = 1;

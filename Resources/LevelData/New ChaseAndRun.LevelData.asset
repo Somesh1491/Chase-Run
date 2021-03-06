@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 941663bdfc298044f8e7cb95bb673b52, type: 3}
   m_Name: New ChaseAndRun.LevelData
   m_EditorClassIdentifier: 
-  gridDimension: {x: 5, y: 5}
+  gridDimension: {x: 10, y: 10}

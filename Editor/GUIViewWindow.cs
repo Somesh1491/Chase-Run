@@ -84,7 +84,7 @@ namespace ChaseAndRun
         levelObject.name = "Level";
         levelObject.AddComponent<Level>();
 
-        levelObject.GetComponent<Level>().SetData(levelData);
+        levelObject.GetComponent<Level>().SetData((LevelData)levelData);
       }
 
       if (levelData.GridDimension.x != gridDimension.x || levelData.GridDimension.y != gridDimension.y)
