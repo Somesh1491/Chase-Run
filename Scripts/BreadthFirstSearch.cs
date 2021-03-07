@@ -43,10 +43,10 @@ namespace ChaseAndRun
     private Node<Cell> CreateGraphAndReturnLastNode()
     {
       //Source and target must lie within surface
-      if (!grid.IsCellExist(SourceIndex) && !grid.IsCellExist(TargetIndex))
+      if (!IsCellExist(SourceIndex) && !IsCellExist(TargetIndex))
         return null;
 
-      Cell endCell = grid.GetCell(TargetIndex);
+      Cell endCell = grid.Cells[TargetIndex.x, TargetIndex.y];
 
       Node<Cell> sourceNode = new Node<Cell>
       {
@@ -107,16 +107,16 @@ namespace ChaseAndRun
       Vector2Int rightDownBlockIndex = rightBlockIndex + Vector2Int.down;
 
       if (IsCellWalkable(leftBlockIndex))
-        neighbours.Add(grid.GetCell(leftBlockIndex));
+        neighbours.Add(grid.Cells[leftBlockIndex.x, leftBlockIndex.y]);
 
       if (IsCellWalkable(rightBlockIndex))
-        neighbours.Add(grid.GetCell(rightBlockIndex));
+        neighbours.Add(grid.Cells[rightBlockIndex.x, rightBlockIndex.y]);
 
       if (IsCellWalkable(downBlockIndex))
-        neighbours.Add(grid.GetCell(downBlockIndex));
+        neighbours.Add(grid.Cells[downBlockIndex.x, downBlockIndex.y]);
 
       if (IsCellWalkable(upBlockIndex))
-        neighbours.Add(grid.GetCell(upBlockIndex));
+        neighbours.Add(grid.Cells[upBlockIndex.x, upBlockIndex.y]);
 
       //Diagonal Neighbour only be considered only if it neighbours are free
       if (overlappingEnable)
@@ -124,41 +124,41 @@ namespace ChaseAndRun
         if (IsCellWalkable(leftUpBlockIndex))
         {
           if (IsCellWalkable(leftBlockIndex) && IsCellWalkable(upBlockIndex))
-            neighbours.Add(grid.GetCell(leftUpBlockIndex));
+            neighbours.Add(grid.Cells[leftUpBlockIndex.x, leftUpBlockIndex.y]);
         }
 
         if (IsCellWalkable(rightUpBlockIndex))
         {
           if (IsCellWalkable(rightBlockIndex) && IsCellWalkable(upBlockIndex))
-            neighbours.Add(grid.GetCell(rightUpBlockIndex));
+            neighbours.Add(grid.Cells[rightUpBlockIndex.x, rightUpBlockIndex.y]);
         }
 
         if (IsCellWalkable(leftDownBlockIndex))
         {
           if (IsCellWalkable(leftBlockIndex) && IsCellWalkable(downBlockIndex))
-            neighbours.Add(grid.GetCell(leftDownBlockIndex));
+            neighbours.Add(grid.Cells[leftDownBlockIndex.x, leftDownBlockIndex.y]);
         }
 
         if (IsCellWalkable(rightDownBlockIndex))
         {
           if (IsCellWalkable(rightBlockIndex) && IsCellWalkable(downBlockIndex))
-            neighbours.Add(grid.GetCell(rightDownBlockIndex));
+            neighbours.Add(grid.Cells[rightDownBlockIndex.x, rightDownBlockIndex.y]);
         }
       }
 
       else
       {
         if (IsCellWalkable(leftUpBlockIndex))
-          neighbours.Add(grid.GetCell(leftUpBlockIndex));
+          neighbours.Add(grid.Cells[leftUpBlockIndex.x, leftUpBlockIndex.y]);
 
         if (IsCellWalkable(rightUpBlockIndex))
-          neighbours.Add(grid.GetCell(rightUpBlockIndex));
+          neighbours.Add(grid.Cells[rightUpBlockIndex.x, rightUpBlockIndex.y]);
 
         if (IsCellWalkable(leftDownBlockIndex))
-          neighbours.Add(grid.GetCell(leftDownBlockIndex));
+          neighbours.Add(grid.Cells[leftDownBlockIndex.x, leftDownBlockIndex.y]);
 
         if (IsCellWalkable(rightDownBlockIndex))
-          neighbours.Add(grid.GetCell(rightDownBlockIndex));
+          neighbours.Add(grid.Cells[rightDownBlockIndex.x, rightDownBlockIndex.y]);
       }
 
       return neighbours;
@@ -166,7 +166,7 @@ namespace ChaseAndRun
 
     private bool IsCellWalkable(Vector2Int index)
     {
-      if (!grid.IsCellExist(index))
+      if (!IsCellExist(index))
         return false;
 
       if (grid.Cells[index.x, index.y].isBlocked)
@@ -176,6 +176,17 @@ namespace ChaseAndRun
         return true;
     }
 
+    private bool IsCellExist(Vector2Int index)
+    {
+      //Horizontal Check
+      if (index.x < 0 || index.x >= grid.GridDimension.x)
+        return false;
+      //Vertical Check
+      if (index.y < 0 || index.y >= grid.GridDimension.y)
+        return false;
+
+      return true;
+    }
     private int GridToLinearPoint(Vector2Int index)
     {
       return ((index.y * grid.GridDimension.x) + index.x);
