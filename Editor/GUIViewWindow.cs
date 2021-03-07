@@ -16,6 +16,7 @@ namespace ChaseAndRun
     private string gridDimensionTextField_X = "0";
     private string gridDimensionTextField_Y = "0";
     private string[] tileTypes = new string[] { "Walkable", "Obstacle" };
+    private string levelName;
     public GUIViewWindow(ILevelEditorData levelEditorData, ILevelWindow levelWindow)
     {
       this.levelEditorData = levelEditorData;
@@ -60,9 +61,17 @@ namespace ChaseAndRun
       int currentTile = EditorGUI.Popup(gridDimensionPopUpRect, (int)levelEditorData.SelectedTile, tileTypes);
       levelEditorData.SelectedTile = (TileType)currentTile;
 
+      //Draw Level Name Text Field
+      x_Offset = (splitFraction * window_width) + 5f; 
+      Rect gridDimensionPopUpLevelFieldRect = new Rect(x_Offset, 60, 100, 20);
+      EditorGUI.LabelField(gridDimensionPopUpLevelFieldRect, "Level Name");
+
+      x_Offset += gridDimensionX_TextField_Rect.width + 10f;
+      Rect LevelName_Rect = new Rect(x_Offset, 60, 100, 20);
+      levelName = EditorGUI.TextField(LevelName_Rect, levelName);
       //Draw Edit and Save Level
       x_Offset = (splitFraction * window_width) + 5f;
-      Rect editButtonRect = new Rect(x_Offset, 60, 100, 20);
+      Rect editButtonRect = new Rect(x_Offset, 80, 100, 20);
       if(GUI.Button(editButtonRect, "Edit Level"))
       {
         levelEditorData.IsEditingEnable = true;
@@ -71,25 +80,19 @@ namespace ChaseAndRun
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
-      Rect saveButtonRect = new Rect(x_Offset, 60, 100, 20);
+      Rect saveButtonRect = new Rect(x_Offset, 80, 100, 20);
       if (GUI.Button(saveButtonRect, "Save Level"))
       {
         string jsonLevelData = JsonConvert.SerializeObject(levelEditorData);
 
         TextAsset textAsset = new TextAsset(jsonLevelData);
 
-        //using (FileStream fs = new FileStream("Assets/Resources/LevelData/LevelData.json", FileMode.Create))
-        //{
-        //  using (StreamWriter writer = new StreamWriter(fs))
-        //  {
-        //    writer.Write(jsonLevelData);
-        //  }
-        //}
-
+        AssetDatabase.CreateAsset(textAsset, "Assets/Resources/LevelData/" + levelName + ".json");
+        
         GameObject levelObj = new GameObject("Level");
         levelObj.AddComponent<Level>().CreateLevel(levelEditorData);
         levelObj.GetComponent<Level>().jsonLevelData = textAsset;
-
+        AssetDatabase.SaveAssets();
         UnityEditor.AssetDatabase.Refresh();
       }
 
