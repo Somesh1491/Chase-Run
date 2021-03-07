@@ -10,13 +10,13 @@ namespace ChaseAndRun
   public class GUIViewWindow
   {
     private ILevelWindow levelWindow;
-    private ILevelData levelData;
+    private ILevelEditorData levelEditorData;
     private string gridDimensionTextField_X = "0";
     private string gridDimensionTextField_Y = "0";
     private string[] tileTypes = new string[] { "Walkable", "Obstacle" };
-    public GUIViewWindow(ILevelData levelData, ILevelWindow levelWindow)
+    public GUIViewWindow(ILevelEditorData levelEditorData, ILevelWindow levelWindow)
     {
-      this.levelData = levelData;
+      this.levelEditorData = levelEditorData;
       this.levelWindow = levelWindow;
     }
 
@@ -55,41 +55,29 @@ namespace ChaseAndRun
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
 
       Rect gridDimensionPopUpRect = new Rect(x_Offset, 40, 100, 20);
-      int currentTile = EditorGUI.Popup(gridDimensionPopUpRect, (int)levelData.SelectedTile, tileTypes);
-      levelData.SelectedTile = (TileType)currentTile;
+      int currentTile = EditorGUI.Popup(gridDimensionPopUpRect, (int)levelEditorData.SelectedTile, tileTypes);
+      levelEditorData.SelectedTile = (TileType)currentTile;
 
       //Draw Edit and Save Level
       x_Offset = (splitFraction * window_width) + 5f;
       Rect editButtonRect = new Rect(x_Offset, 60, 100, 20);
       if(GUI.Button(editButtonRect, "Edit Level"))
       {
-        levelData.IsEditingEnable = true;
-        levelData.Cells = new Cell<TileType>[gridDimension.x * gridDimension.y];
-
-        //Make all cell walkable
-        for(int i = 0; i < levelData.Cells.Length; i++)
-        {
-          levelData.Cells[i].weight = 1;
-        }
+        levelEditorData.IsEditingEnable = true;
+        levelEditorData.Cells = new Cell[gridDimension.x, gridDimension.y];
+        levelEditorData.tileType = new TileType[gridDimension.x, gridDimension.y];
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;
       Rect saveButtonRect = new Rect(x_Offset, 60, 100, 20);
       if (GUI.Button(saveButtonRect, "Save Level"))
       {
-        ScriptableObjectUtility.SaveAsset<LevelData>((LevelData)levelData, "Assets/Resources/LevelData");
         
-        //Create a Game object and assign a level data to it
-        GameObject levelObject = new GameObject();
-        levelObject.name = "Level";
-        levelObject.AddComponent<Level>();
-
-        levelObject.GetComponent<Level>().SetData((LevelData)levelData);
       }
 
-      if (levelData.GridDimension.x != gridDimension.x || levelData.GridDimension.y != gridDimension.y)
+      if (levelEditorData.GridDimension.x != gridDimension.x || levelEditorData.GridDimension.y != gridDimension.y)
       {
-        levelData.GridDimension = gridDimension;
+        levelEditorData.GridDimension = gridDimension;
       }
 
       //Execute code if mouse is in scene view or gui view

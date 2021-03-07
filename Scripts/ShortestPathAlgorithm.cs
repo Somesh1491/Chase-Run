@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace ChaseAndRun
 {
-  public abstract class ShortestPathAlgorithm<T>
+  public abstract class ShortestPathAlgorithm
   {
     public Vector2Int SourceIndex { get; set; }
     public Vector2Int TargetIndex { get; set; }
 
-    protected IGrid<T> grid;
+    protected IGrid grid;
 
-    protected Dictionary<int, Node<Cell<T>>> nodesInGraph = new Dictionary<int, Node<Cell<T>>>();
+    protected Dictionary<int, Node<Cell>> nodesInGraph = new Dictionary<int, Node<Cell>>();
 
     public abstract List<Vector2Int> ShortestPath { get; }
 

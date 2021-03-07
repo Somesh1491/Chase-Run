@@ -10,20 +10,20 @@ namespace ChaseAndRun
     public Node<T> parent;
   }
 
-  public class BreadthFirstSearch<T> : ShortestPathAlgorithm<T>
+  public class BreadthFirstSearch : ShortestPathAlgorithm
   {
     private bool overlappingEnable = true;
 
     public override List<Vector2Int> ShortestPath { get { return GetShortestPath(); } }
 
-    public BreadthFirstSearch(IGrid<T> grid)
+    public BreadthFirstSearch(IGrid grid)
     {
       this.grid = grid;
     }
 
     protected override List<Vector2Int> GetShortestPath()
     {
-      Node<Cell<T>> exploringNode = CreateGraphAndReturnLastNode();
+      Node<Cell> exploringNode = CreateGraphAndReturnLastNode();
       List<Vector2Int> shortestPath = new List<Vector2Int>();
 
       //Do not include the start node
@@ -40,16 +40,15 @@ namespace ChaseAndRun
       return shortestPath;
     }
 
-    private Node<Cell<T>> CreateGraphAndReturnLastNode()
+    private Node<Cell> CreateGraphAndReturnLastNode()
     {
       //Source and target must lie within surface
       if (!grid.IsCellExist(SourceIndex) && !grid.IsCellExist(TargetIndex))
         return null;
 
-      Cell<T> startCell = grid.GetCell(SourceIndex);
-      Cell<T> endCell = grid.GetCell(TargetIndex);
+      Cell endCell = grid.GetCell(TargetIndex);
 
-      Node<Cell<T>> sourceNode = new Node<Cell<T>>
+      Node<Cell> sourceNode = new Node<Cell>
       {
         parent = null
       };
@@ -58,12 +57,11 @@ namespace ChaseAndRun
       queue.Enqueue(sourceNode);
 
       bool loopTerminationFlag = false;
-      Node<Cell<T>> currentNode = null;
-      Node<Cell<T>> lastNode = null;
+      Node<Cell> lastNode = null;
 
       do
       {
-        currentNode = (Node<Cell<T>>)queue.Dequeue();
+        Node<Cell> currentNode = (Node<Cell>)queue.Dequeue();
 
         //Get Neighbours of current Block
         foreach (var neighbour in GetNeighbours(currentNode.item))
@@ -73,7 +71,7 @@ namespace ChaseAndRun
             continue;
 
           //Create new Node for neighbour Block
-          Node<Cell<T>> newNode = new Node<Cell<T>>
+          Node<Cell> newNode = new Node<Cell>
           {
             parent = currentNode
           };
@@ -94,9 +92,9 @@ namespace ChaseAndRun
       return lastNode;
     }
 
-    private List<Cell<T>> GetNeighbours(Cell<T> cell)
+    private List<Cell> GetNeighbours(Cell cell)
     {
-      List<Cell<T>> neighbours = new List<Cell<T>>();
+      List<Cell> neighbours = new List<Cell>();
 
       Vector2Int leftBlockIndex = cell.index + Vector2Int.left;
       Vector2Int rightBlockIndex = cell.index + Vector2Int.right;
@@ -171,7 +169,7 @@ namespace ChaseAndRun
       if (!grid.IsCellExist(index))
         return false;
 
-      if (grid.GetCell(index).weight == -1)
+      if (grid.Cells[index.x, index.y].isBlocked)
         return false;
 
       else

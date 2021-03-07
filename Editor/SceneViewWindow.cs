@@ -7,22 +7,23 @@ namespace ChaseAndRun
 {
   public class SceneViewWindow
   {
-    private ILevelData levelData;
+    private ILevelEditorData levelEditorData;
     private ILevelWindow levelWindow;
 
-    public SceneViewWindow(ILevelData levelData, ILevelWindow levelWindow)
+    public SceneViewWindow(ILevelEditorData levelEditorData, ILevelWindow levelWindow)
     {
-      this.levelData = levelData;
+      this.levelEditorData = levelEditorData;
       this.levelWindow = levelWindow;
     }
 
     public void DrawSceneView()
     {
+      //Draw Wire Frame
       float window_width = levelWindow.Width;
       float window_height = levelWindow.Height;
       float splitFraction = levelWindow.SplitFraction;
 
-      Vector2Int gridDimension = levelData.GridDimension;
+      Vector2Int gridDimension = levelEditorData.GridDimension;
 
       float sceneViewWidth = splitFraction * window_width;
       float sceneViewHeight = window_height;
@@ -39,17 +40,17 @@ namespace ChaseAndRun
         }
       }
 
-      //Draw Tiles 
-      if (levelData.Cells != null)
+      //Draw Tiles
+      if (levelEditorData.Cells != null)
       {
-        for (int i = 0; i < levelData.Cells.Length; i++)
+        for (int i = 0; i < levelEditorData.Cells.Length; i++)
         {
 
           int y = i / gridDimension.x;
           int x = i % gridDimension.x;
 
           Vector3 tileScreenPosition = GridToScreenPoint(new Vector2Int(x, y));
-          switch (levelData.GetCell(new Vector2Int(x, y)).item)
+          switch (levelEditorData.tileType[x, y])
           {
             case TileType.Walkable:
               Handles.DrawSolidRectangleWithOutline(new Rect(tileScreenPosition.x, tileScreenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
@@ -72,9 +73,9 @@ namespace ChaseAndRun
 
     private void OnPointerOver()
     {
-      if(levelData.IsEditingEnable)
+      if(levelEditorData.IsEditingEnable)
       {
-        Vector2Int gridDimension = levelData.GridDimension;
+        Vector2Int gridDimension = levelEditorData.GridDimension;
         float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
         float sceneViewHeight = levelWindow.Height;
 
@@ -84,24 +85,24 @@ namespace ChaseAndRun
         Vector2Int gridPosition = ScreenToGridPoint(Event.current.mousePosition);
         Vector3 screenPosition = GridToScreenPoint(gridPosition);
 
-        if(levelData.SelectedTile == TileType.Walkable)
+        if(levelEditorData.SelectedTile == TileType.Walkable)
           Handles.DrawSolidRectangleWithOutline(new Rect(screenPosition.x, screenPosition.y, blockWidth, blockHeight), Color.red, Color.black);
 
-        else if(levelData.SelectedTile == TileType.Obstacle)
+        else if(levelEditorData.SelectedTile == TileType.Obstacle)
           Handles.DrawSolidRectangleWithOutline(new Rect(screenPosition.x, screenPosition.y, blockWidth, blockHeight), Color.gray, Color.black);
 
         //If Mouse Click over grid
         if(Event.current.type == EventType.MouseUp)
         {
           Vector2Int gridPoint = ScreenToGridPoint(Event.current.mousePosition);
-          levelData.SetCell(new Vector2Int(gridPoint.x, gridPoint.y), levelData.SelectedTile);
+          levelEditorData.tileType[gridPoint.x, gridPoint.y] = levelEditorData.SelectedTile;
         }
       }
     }
 
     private Vector2Int ScreenToGridPoint(Vector3 screenPoint)
     {
-      Vector2Int gridDimension = levelData.GridDimension;
+      Vector2Int gridDimension = levelEditorData.GridDimension;
       float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
       float sceneViewHeight = levelWindow.Height;
 
@@ -117,8 +118,8 @@ namespace ChaseAndRun
 
     private Vector3 GridToScreenPoint(Vector2Int gridPoint)
     {
-      gridPoint.y = (levelData.GridDimension.y - 1) - gridPoint.y;
-      Vector2Int gridDimension = levelData.GridDimension;
+      gridPoint.y = (levelEditorData.GridDimension.y - 1) - gridPoint.y;
+      Vector2Int gridDimension = levelEditorData.GridDimension;
       float sceneViewWidth = levelWindow.SplitFraction * levelWindow.Width;
       float sceneViewHeight = levelWindow.Height;
 

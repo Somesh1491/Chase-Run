@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace ChaseAndRun
 {
-  public interface ILevelData : IGrid<TileType>
+  public interface ILevelData : IGrid
   {
-    TileType SelectedTile { get; set; }
-    bool IsEditingEnable { get; set; }
+    TileType[,] tileType { get; set; }
   }
 }

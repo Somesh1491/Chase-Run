@@ -4,19 +4,18 @@ using UnityEngine;
 
 namespace ChaseAndRun
 {
-  public struct Cell<T>
+  public struct Cell
   {
-    public T item;
+    public bool isBlocked;
     public Vector2Int index;
-    public int weight;
   }
-  public interface IGrid<T>
+  public interface IGrid
   {
     Vector2Int GridDimension { get; set; }
-    Cell<T>[] Cells { get; set; }
+    Cell[,] Cells { get; set; }
 
     bool IsCellExist(Vector2Int index);
-    Cell<T> GetCell(Vector2Int index);
-    void SetCell(Vector2Int index, T value);
+    Cell GetCell(Vector2Int index);
+    void SetCell(Vector2Int index, Cell cell);
   }
 }

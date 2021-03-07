@@ -19,7 +19,7 @@ namespace ChaseAndRun
 
     private static SceneViewWindow sceneViewWindow;
     private static GUIViewWindow guiViewWindow;
-    private static ILevelData levelData;
+    private static ILevelEditorData levelEditorData;
     private static ILevelWindow levelWindow;
 
     [MenuItem("Chase-Run/Open Level Editor")]
@@ -30,11 +30,11 @@ namespace ChaseAndRun
 
     private void OnEnable()
     {
-      levelData = ScriptableObjectUtility.CreateAsset<LevelData>();
+      levelEditorData = new LevelEditorData();
       levelWindow = new LevelWindow();
 
-      sceneViewWindow = new SceneViewWindow(levelData, levelWindow);
-      guiViewWindow = new GUIViewWindow(levelData, levelWindow);
+      sceneViewWindow = new SceneViewWindow(levelEditorData, levelWindow);
+      guiViewWindow = new GUIViewWindow(levelEditorData, levelWindow);
 
       //Equal area is given to scene view and gui view in window
       levelWindow.SplitFraction = 0.5f;
