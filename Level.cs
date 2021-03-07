@@ -19,24 +19,24 @@ namespace ChaseAndRun
     [SerializeField]
     private Transform enemy;
     [SerializeField]
-    private TextAsset jsonLevelData;
+    public TextAsset jsonLevelData;
 
     private void Start()
     {
       levelData = JsonConvert.DeserializeObject<LevelEditorData>(jsonLevelData.text);
-      CreateLevel();
 
       player.localScale = transform.localScale;
       Vector2Int playerGridPos = WorldToGridPoint(player.position);
-      player.transform.position = GridToWorldPoint(playerGridPos) + Vector3.right * 0.5f + Vector3.up * 0.5f;
+      player.transform.position = GridToWorldPoint(playerGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
 
       enemy.localScale = transform.localScale;
       Vector2Int enemyGridPos = WorldToGridPoint(enemy.position);
-      enemy.transform.position = GridToWorldPoint(enemyGridPos) + Vector3.right * 0.5f + Vector3.up * 0.5f;
+      enemy.transform.position = GridToWorldPoint(enemyGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
     }
 
-    private void CreateLevel()
+    public void CreateLevel(ILevelData levelData)
     {
+      this.levelData = levelData;
       GameObject gameObject = null;
       for(int j = 0; j < levelData.tileType.GetLength(1); j++)
       {
