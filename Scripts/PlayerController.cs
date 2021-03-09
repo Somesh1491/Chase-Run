@@ -6,7 +6,7 @@ namespace ChaseAndRun
 {
   public class PlayerController : MonoBehaviour
   {
-    public Vector3 targetPosition;
+    public List<Vector3> PathToTravel { get { return pathToTravel; } set { pathToTravel = value; } }
     public float speed = 10;
 
     [SerializeField]
@@ -15,7 +15,7 @@ namespace ChaseAndRun
     public void SetPlayerPosition()
     {
       if(pathToTravel.Count > 0)
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);    
+        transform.position = Vector3.MoveTowards(transform.position, pathToTravel[0], speed * Time.deltaTime);    
     }
   }
 }

@@ -76,7 +76,23 @@ namespace ChaseAndRun
       {
         levelEditorData.IsEditingEnable = true;
         levelEditorData.Cells = new Cell[gridDimension.x, gridDimension.y];
+        for(int j = 0; j < levelEditorData.Cells.GetLength(1); j++)
+        {
+          for(int i = 0; i < levelEditorData.Cells.GetLength(0); i++)
+          {
+            levelEditorData.Cells[i, j].index = new Vector2Int(i, j);
+          }
+        }
+
         levelEditorData.tileType = new TileType[gridDimension.x, gridDimension.y];
+
+        for (int j = 0; j < levelEditorData.Cells.GetLength(1); j++)
+        {
+          for (int i = 0; i < levelEditorData.Cells.GetLength(0); i++)
+          {
+            levelEditorData.Cells[i, j].isBlocked = false;
+          }
+        }
       }
 
       x_Offset += gridDimensionX_TextField_Rect.width + 10f;

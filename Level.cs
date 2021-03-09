@@ -21,18 +21,26 @@ namespace ChaseAndRun
     [SerializeField]
     public TextAsset jsonLevelData;
 
+    private bool isGameStarted = false;
+    Vector3 currentMousePosition;
+
+    private ShortestPathAlgorithm shortestPathAlgorithm;
+
     private void Start()
     {
       levelData = JsonConvert.DeserializeObject<LevelEditorData>(jsonLevelData.text);
 
       player.localScale = transform.localScale;
       Vector2Int playerGridPos = WorldToGridPoint(player.position);
-      player.transform.position = GridToWorldPoint(playerGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
+      player.transform.position = GridToWorldPoint(playerGridPos);
 
       enemy.localScale = transform.localScale;
       Vector2Int enemyGridPos = WorldToGridPoint(enemy.position);
-      enemy.transform.position = GridToWorldPoint(enemyGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
+      enemy.transform.position = GridToWorldPoint(enemyGridPos);
+
+      shortestPathAlgorithm = new BreadthFirstSearch(levelData);
     }
+
 
     public void CreateLevel(ILevelData levelData)
     {
@@ -68,28 +76,42 @@ namespace ChaseAndRun
 
     private void Update()
     {
-      if(Input.GetMouseButtonDown(0))
+
+      if (Input.GetMouseButtonDown(0))
       {
-        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        currentMousePosition = mouseWorldPos;
+
+        isGameStarted = true;
       }
 
-      //Set Player Pos Auto
-      if(Input.GetKeyDown(KeyCode.Space))
+      if (isGameStarted)
       {
-        player.localScale = transform.localScale;
-        Vector2Int playerGridPos = WorldToGridPoint(player.position);
-        player.transform.position = GridToWorldPoint(playerGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
+        shortestPathAlgorithm.SourceIndex = WorldToGridPoint(player.transform.position);
+        shortestPathAlgorithm.TargetIndex = WorldToGridPoint(currentMousePosition);
 
-        enemy.localScale = transform.localScale;
-        Vector2Int enemyGridPos = WorldToGridPoint(enemy.position);
-        enemy.transform.position = GridToWorldPoint(enemyGridPos) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
+        var a = shortestPathAlgorithm.ShortestPath;
+
+        foreach (var point in a)
+          Debug.Log(point);
+
+        //player.GetComponent<PlayerController>().PathToTravel = GetWorldPoint(a);
+        //player.GetComponent<PlayerController>().SetPlayerPosition();
+
+        //shortestPathAlgorithm.SourceIndex = WorldToGridPoint(enemy.transform.position);
+        //shortestPathAlgorithm.TargetIndex = WorldToGridPoint(player.transform.position);
+
+        //var b = shortestPathAlgorithm.ShortestPath;
+        //enemy.GetComponent<EnemyController>().PathToTravel = GetWorldPoint(b);
+        //enemy.GetComponent<EnemyController>().SetEnemyPosition();
+        isGameStarted = false;
       }
     }
 
-    private Vector3 GridToWorldPoint(Vector2Int index)
+      private Vector3 GridToWorldPoint(Vector2Int index)
     {
       Matrix4x4 localToWorldMatrix = transform.localToWorldMatrix;
-      return localToWorldMatrix.MultiplyPoint3x4(new Vector3(index.x, index.y));
+      return localToWorldMatrix.MultiplyPoint3x4(new Vector3(index.x, index.y)) + Vector3.right * 0.5f * transform.localScale.x + Vector3.up * 0.5f * transform.localScale.y;
     }
 
     private Vector2Int WorldToGridPoint(Vector3 worldPoint)
@@ -98,6 +120,17 @@ namespace ChaseAndRun
       Vector3 localWorldPoint = worldToLocalMatrix.MultiplyPoint3x4(worldPoint);
 
       return new Vector2Int((int)localWorldPoint.x, (int)localWorldPoint.y);
+    }
+
+    private List<Vector3> GetWorldPoint(List<Vector2Int> gridPoint)
+    {
+      List<Vector3> worldPoints = new List<Vector3>();
+      foreach(var point in gridPoint)
+      {
+        worldPoints.Add(GridToWorldPoint(point));
+      }
+
+      return worldPoints;
     }
   } 
 }

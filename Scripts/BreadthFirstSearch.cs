@@ -42,14 +42,18 @@ namespace ChaseAndRun
 
     private Node<Cell> CreateGraphAndReturnLastNode()
     {
+      //Clear previous Data
+      if (nodesInGraph.Count > 0)
+        nodesInGraph.Clear();
+
       //Source and target must lie within surface
       if (!IsCellExist(SourceIndex) && !IsCellExist(TargetIndex))
         return null;
 
       Cell endCell = grid.Cells[TargetIndex.x, TargetIndex.y];
-
       Node<Cell> sourceNode = new Node<Cell>
       {
+        item = endCell,
         parent = null
       };
 
@@ -73,6 +77,7 @@ namespace ChaseAndRun
           //Create new Node for neighbour Block
           Node<Cell> newNode = new Node<Cell>
           {
+            item = neighbour,
             parent = currentNode
           };
 

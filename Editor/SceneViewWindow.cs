@@ -97,7 +97,7 @@ namespace ChaseAndRun
           Vector2Int gridPoint = ScreenToGridPoint(Event.current.mousePosition);
           levelEditorData.tileType[gridPoint.x, gridPoint.y] = levelEditorData.SelectedTile;
 
-          switch(levelEditorData.SelectedTile)
+          switch (levelEditorData.SelectedTile)
           {
             case TileType.Walkable:
               levelEditorData.Cells[gridPoint.x, gridPoint.y].isBlocked = false;
