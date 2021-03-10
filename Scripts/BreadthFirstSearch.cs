@@ -50,10 +50,11 @@ namespace ChaseAndRun
       if (!IsCellExist(SourceIndex) && !IsCellExist(TargetIndex))
         return null;
 
+      Cell startCell = grid.Cells[SourceIndex.x, SourceIndex.y];
       Cell endCell = grid.Cells[TargetIndex.x, TargetIndex.y];
       Node<Cell> sourceNode = new Node<Cell>
       {
-        item = endCell,
+        item = startCell,
         parent = null
       };
 

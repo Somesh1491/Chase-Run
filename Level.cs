@@ -77,7 +77,7 @@ namespace ChaseAndRun
     private void Update()
     {
 
-      if (Input.GetMouseButtonDown(0))
+      if (Input.GetMouseButton(0))
       {
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         currentMousePosition = mouseWorldPos;
@@ -92,19 +92,19 @@ namespace ChaseAndRun
 
         var a = shortestPathAlgorithm.ShortestPath;
 
-        foreach (var point in a)
-          Debug.Log(point);
+        player.GetComponent<PlayerController>().PathToTravel = GetWorldPoint(a);
+        player.GetComponent<PlayerController>().SetPlayerPosition();
+        player.GetComponent<LineRenderer>().positionCount = GetWorldPoint(a).Count;
+        player.GetComponent<LineRenderer>().SetPositions(GetWorldPoint(a).ToArray());
 
-        //player.GetComponent<PlayerController>().PathToTravel = GetWorldPoint(a);
-        //player.GetComponent<PlayerController>().SetPlayerPosition();
+        shortestPathAlgorithm.SourceIndex = WorldToGridPoint(enemy.transform.position);
+        shortestPathAlgorithm.TargetIndex = WorldToGridPoint(player.transform.position);
 
-        //shortestPathAlgorithm.SourceIndex = WorldToGridPoint(enemy.transform.position);
-        //shortestPathAlgorithm.TargetIndex = WorldToGridPoint(player.transform.position);
-
-        //var b = shortestPathAlgorithm.ShortestPath;
-        //enemy.GetComponent<EnemyController>().PathToTravel = GetWorldPoint(b);
-        //enemy.GetComponent<EnemyController>().SetEnemyPosition();
-        isGameStarted = false;
+        var b = shortestPathAlgorithm.ShortestPath;
+        enemy.GetComponent<EnemyController>().PathToTravel = GetWorldPoint(b);
+        enemy.GetComponent<EnemyController>().SetEnemyPosition();
+        enemy.GetComponent<LineRenderer>().positionCount = GetWorldPoint(b).Count;
+        enemy.GetComponent<LineRenderer>().SetPositions(GetWorldPoint(b).ToArray());
       }
     }
 

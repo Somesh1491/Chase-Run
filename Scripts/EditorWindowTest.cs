@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 public class EditorWindowTest : EditorWindow
 {
   [MenuItem("Window/Tile View")]
@@ -43,3 +44,4 @@ public class EditorWindowTest : EditorWindow
     Handles.EndGUI();
   }
 }
+#endif

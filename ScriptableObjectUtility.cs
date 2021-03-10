@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.IO;
 
+#if UNITY_EDITOR
 public static class ScriptableObjectUtility
 {
 	/// <summary>
@@ -26,3 +27,4 @@ public static class ScriptableObjectUtility
 
 	}
 }
+#endif
